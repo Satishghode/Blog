@@ -2,7 +2,7 @@ import express from 'express';
 import connectDB from './db/connection.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv'
- 
+import userRouter from './routes/user.routes.js'
 
 dotenv.config();
 
@@ -19,19 +19,9 @@ connectDB()
     console.log(`this is DB connection error ${error}`); 
 })
 
-//  ROUTRES
-
+// create a server instance and assign the port to the server instance 
 app.listen(process.env.PORT || 3000 , () => {
     console.log(`server is listening on port  ${process.env.PORT} `  )
 });
 
-
-
-app.get('/',(req, res) => {
-
-    res.send("Server is on home page");
-})
-
-
-
-
+app.use('/api/users', userRouter);
