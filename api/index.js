@@ -1,13 +1,13 @@
 import express from 'express';
 import connectDB from './db/connection.js';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv'
 import userRouter from './routes/user.routes.js'
-
+import authRouter from './routes/auth.routes.js'
 dotenv.config();
 
 
 const app = express();
+app.use(express.json());
 
 // establishing a database connection to the server and connect to the database server.
 
@@ -25,3 +25,4 @@ app.listen(process.env.PORT || 3000 , () => {
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/auth', authRouter);
