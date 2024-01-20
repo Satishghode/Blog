@@ -12,8 +12,6 @@ const connectDB = async () =>{
 
 export default connectDB;
 
-
-
 //  this is second way to connect to the database server and connect to the database server.
     
 
