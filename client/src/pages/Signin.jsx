@@ -1,12 +1,14 @@
 import { Alert, Button, FloatingLabel, Label, Spinner, TextInput } from "flowbite-react";
 import React, { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signInStart, signInSuccess , signInFailure } from "../redux/user/userSlice.js";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {loading, error: errorMessage } = useSelector( state => state.user );
   
 // to get the form data from the label tag and set the data using setFormData() in to the fromData property
 const handelChange = (event) => {
@@ -18,11 +20,10 @@ const handelChange = (event) => {
 const handelSubmit = async(event) => {
   event.preventDefault();
   if ( !formData.email || !formData.password ) {
-    return setErrorMessage('Please fill out all requried files.')
+    return dispatch(signInFailure(" please fill all the fields  "));
   }
   try {
-    setLoading(true);
-    setErrorMessage(null);
+    dispatch(signInStart());
     const res = await fetch('/api/auth/signin',{
       method : 'POST',
       headers:{'content-type': 'application/json' },
@@ -30,16 +31,14 @@ const handelSubmit = async(event) => {
     })
     const data = await res.json();
     if (data.success == false) {
-      setLoading(false)
-      return setErrorMessage('Invalid email or password ');
+      dispatch(signInFailure(data.message));
     }
-    setLoading(false);
     if (res.ok) {
+      dispatch(signInSuccess(data));
       navigate('/');
-    }ē
+    }
   } catch (error) {
-    setErrorMessage(error.message);
-    setLoading(false);
+    dispatch(signInFailure(error.message))
   }
 }
 
