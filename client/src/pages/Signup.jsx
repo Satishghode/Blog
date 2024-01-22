@@ -54,9 +54,7 @@ const handelSubmit = async(event) => {
             blog's
           </Link>
           <p className="text-sm mt-5">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nostrum
-            aliquid reprehenderit expedita culpa ullam nobis facilis fugit, ipsa
-            maxime sit?
+            You can signup with your email and password or signin with Google.
           </p>
         </div>
 
