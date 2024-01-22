@@ -1,8 +1,7 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
-import jwt from 'jsonwebtoken';
-
+import jwt from "jsonwebtoken";
 
 export const singnUp = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -26,8 +25,9 @@ export const singnUp = async (req, res, next) => {
     email,
     password: hashedPassword,
   });
-
+  //  create the try/catch block to handle the unexpected/unwanted exception  and error.
   try {
+    // save the user in mongoose using the save() method.
     await newUser.save();
     res.json("singnUp successful ");
   } catch (error) {
@@ -36,6 +36,7 @@ export const singnUp = async (req, res, next) => {
 };
 
 export const signIn = async (req, res, next) => {
+  // 
   const { email, password } = req.body;
   //  check the email and password fields are fields,
   if (!email || !password || email === "" || password === "") {
@@ -43,19 +44,22 @@ export const signIn = async (req, res, next) => {
   }
 
   try {
+    // find single user in the database using the findOne() method.
     const validUser = await User.findOne({ email });
     //     check the user is present or not inside the databse.
     if (!validUser) {
       return next(errorHandler(404, "User not Found or invalid credentials."));
     }
+    // compare the database password with the user password comming from the fornt end
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword) {
-       return next(errorHandler(404, "Invalid credentials."));
+      return next(errorHandler(404, "Invalid credentials."));
     }
+    // create an cookie using the json web token
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_TOKEN);
-
-    const {password: pass, ...rest} = validUser._doc; 
-
+    //  skip the password to sent the client web page
+    const { password: pass, ...rest } = validUser._doc;
+    // sent the responce with the status code and token in json format
     res
       .status(200)
       .cookie("access_token", token, {
