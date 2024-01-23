@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signInStart, signInSuccess , signInFailure } from "../redux/user/userSlice.js";
+import OAuth from "../components/Oauth.jsx";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
@@ -90,6 +91,7 @@ const handelSubmit = async(event) => {
                 ): 'Sign In'
               }
             </Button>
+            <OAuth />
           </form>
           <div className="flex gap-2 text-sm mt-5">
             <span> Don't Have an account?</span>

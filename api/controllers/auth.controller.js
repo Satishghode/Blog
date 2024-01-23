@@ -36,7 +36,7 @@ export const singnUp = async (req, res, next) => {
 };
 
 export const signIn = async (req, res, next) => {
-  // 
+  //
   const { email, password } = req.body;
   //  check the email and password fields are fields,
   if (!email || !password || email === "" || password === "") {
@@ -68,5 +68,46 @@ export const signIn = async (req, res, next) => {
       .json(rest);
   } catch (error) {
     next(errorHandler(error));
+  }
+};
+
+export const google = async (req, res, next) => {
+  const { name, email, googlePhotosUrl } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      const token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN);
+      const { password, ...rest } = user._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    } else {
+      const generatePassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatePassword, 10);
+      const newUser = new User({
+        username:
+          name.toLowerCase().split(" ").join("") +
+          Math.random().toString(9).slice(-4),
+        email,
+        password: hashedPassword,
+        profilePhoto: googlePhotosUrl,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_TOKEN);
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    }
+  } catch (error) {
+    next(error);
   }
 };
