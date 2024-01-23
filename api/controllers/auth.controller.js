@@ -83,7 +83,7 @@ export const google = async (req, res, next) => {
         .cookie("access_token", token, {
           httpOnly: true,
         })
-        .json(rest);
+        .json(rest);  
     } else {
       const generatePassword =
         Math.random().toString(36).slice(-8) +

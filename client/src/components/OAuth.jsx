@@ -15,16 +15,16 @@ function Oauth() {
        const provider =  new GoogleAuthProvider();
        provider.setCustomParameters({ prompt : 'select_account' });
        try {
-        const resultsFormGooele =  await signInWithPopup(auth, provider);
+        const resultsFormGoogle =  await signInWithPopup(auth, provider);
         const res = await fetch('/api/auth/google',{
             method : 'POST',
             headers : {
                 'Content-Type' : 'application/json'
             },
             body : JSON.stringify({
-                name : resultsFormGooele.user.displayName,
-                email : resultsFormGooele.user.email,
-                gogolePhotoUrl : resultsFormGooele.user.photoURL
+                name : resultsFormGoogle.user.displayName,
+                email : resultsFormGoogle.user.email,
+                googlePhotoUrl : resultsFormGoogle.user.photoURL,
             }),
         })
         const data = await res.json();
@@ -45,4 +45,4 @@ function Oauth() {
   )
 }
 
-export default Oauth
+export default Oauth ;
