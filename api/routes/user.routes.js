@@ -1,9 +1,11 @@
 import express from 'express';
-import { test } from '../controllers/user.controllres.js';
+import { updateUser } from "../controllers/user.controllres.js";
+import { verifyUser } from '../utils/verifyUser.js';
 
 const routes = express.Router();
 
 
-routes.get('/test', test)
+
+routes.put("/update/:userId",verifyUser , updateUser);
 
 export default routes;
