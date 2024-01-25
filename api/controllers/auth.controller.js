@@ -56,7 +56,7 @@ export const signIn = async (req, res, next) => {
       return next(errorHandler(404, "Invalid credentials."));
     }
     // create an cookie using the json web token
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_TOKEN);
+    const token = jwt.sign({ id: validUser._id , isAdmin:validUser.isAdmin }, process.env.JWT_TOKEN);
     //  skip the password to sent the client web page
     const { password: pass, ...rest } = validUser._doc;
     // sent the responce with the status code and token in json format
@@ -76,7 +76,7 @@ export const google = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      const token = jwt.sign({ id: user.id }, process.env.JWT_TOKEN);
+      const token = jwt.sign({ id: user.id, isAdmin:user.isAdmin }, process.env.JWT_TOKEN);
       const { password, ...rest } = user._doc;
       res
         .status(200)
@@ -98,7 +98,7 @@ export const google = async (req, res, next) => {
         profilePhoto:googlePhotoUrl,
       });
       await newUser.save();
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_TOKEN);
+      const token = jwt.sign({ id: newUser._id, isAdmin:newUser.isAdmin }, process.env.JWT_TOKEN);
       const { password, ...rest } = newUser._doc;
       res
         .status(200)
