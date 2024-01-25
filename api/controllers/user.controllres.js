@@ -2,6 +2,7 @@ import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
 
+// this function is used to Update the data ex:  username, profile picture , email and password 
 
 export const updateUser = async (req, res, next) => {
   if (req.user.id !== req.params.userId) {
@@ -50,3 +51,18 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+// this method is used to delete a user form the database server .
+
+export const deleteUser = async (req, res, next) => { 
+  if (req.user.id !== req.params.userId) {
+    return next(errorHandler(403, 'You are not allowed to delete the user'));
+  }
+  try {
+    await User.findByIdAndDelete(req.params.userId);
+    res.status(200).json("User has been Deleted " );
+  } catch (error) {
+    next(error);
+  }
+
+}
