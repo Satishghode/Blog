@@ -91,24 +91,23 @@ function DashProfile() {
   };
   // this is function to handle the change on the form submission button.
   const handleSubmit = async (e) => {
-    e.defaultValue();
+    e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
-    // when the data form is empty then return.
     if (Object.keys(formData).length === 0) {
-      setUpdateUserError(" No changes made  ");
+      setUpdateUserError('No changes made');
       return;
     }
     if (imageFileUploading) {
-      setUpdateUserError(" plase wait for image file upload. ");
+      setUpdateUserError('Please wait for image to upload');
       return;
     }
     try {
       dispatch(updateStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
@@ -117,11 +116,12 @@ function DashProfile() {
         dispatch(updateFailuer(data.message));
         setUpdateUserError(data.message);
       } else {
-        dispatch(updateSuccess(data.message));
-        setUpdateUserSuccess("User Profile Updated successfully ");
+        dispatch(updateSuccess(data));
+        setUpdateUserSuccess("User's profile updated successfully");
       }
     } catch (error) {
       dispatch(updateFailuer(error.message));
+      setUpdateUserError(error.message);
     }
   };
 
