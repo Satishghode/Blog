@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Alert, Button, TextInput } from "flowbite-react";
+import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import {
   getDownloadURL,
   getStorage,
@@ -14,21 +14,26 @@ import {
   updateStart,
   updateSuccess,
   updateFailuer,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
+import { BsExclamationCircle } from "react-icons/bs";
 
 function DashProfile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, error } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUPloadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState();
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [imageFileUploading, setimageFileUploading] = useState(false);
-  const [ updateUserError , setUpdateUserError ] = useState(null);
+  const [updateUserError, setUpdateUserError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const filePickerRef = useRef();
   const [formData, setFormData] = useState({});
-  const dispatch = useState();
+  const dispatch = useDispatch();
 
   const handelImageChange = (e) => {
     const file = e.target.files[0];
@@ -42,6 +47,8 @@ function DashProfile() {
       uploadImage();
     }
   }, [imageFile]);
+
+  // Upload the image file to the firebase server and create a images URL link for storing the image file reference in the database server.
 
   const uploadImage = async () => {
     setimageFileUploading(true);
@@ -75,7 +82,9 @@ function DashProfile() {
       }
     );
   };
+
   // when the user fill the input field, inside the Dashboard profile.
+
   const handelChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -86,7 +95,7 @@ function DashProfile() {
     setUpdateUserSuccess(null);
     // when the data form is empty then return.
     if (Object.keys(formData).length === 0) {
-      setUpdateUserError(" No changes made  " );
+      setUpdateUserError(" No changes made  ");
       return;
     }
     if (imageFileUploading) {
@@ -112,6 +121,25 @@ function DashProfile() {
       }
     } catch (error) {
       dispatch(updateFailuer(error.message));
+    }
+  };
+
+  //
+  const handleDeleteUser = async () => {
+    setShowModal(false);
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(deleteUserFailure(data.message));
+      } else {
+        dispatch(deleteUserSuccess(data));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
     }
   };
 
@@ -189,11 +217,55 @@ function DashProfile() {
         </Button>
       </form>
       <div className="text-red-500 justify-between flex mt-3">
-        <span className="cursor-pointer ">Delete account</span>
+        <span
+          className="cursor-pointer "
+          onClick={() => {
+            setShowModal(true);
+          }}
+        >
+          Delete account
+        </span>
         <span className="cursor-pointer ">Sign-out</span>
       </div>
-      {updateUserSuccess && <Alert color="success" className="mt-5" >{updateUserSuccess}</Alert>}
-      { updateUserError && <Alert color="danger" className="mt-5 "> {updateUserError}</Alert>}
+      {updateUserSuccess && (
+        <Alert color="success" className="mt-5">
+          {updateUserSuccess}
+        </Alert>
+      )}
+      {updateUserError && (
+        <Alert color="danger" className="mt-5 ">
+          {updateUserError}
+        </Alert>
+      )}
+      {error && (
+        <Alert color="danger" className="mt-5 ">
+          {error}
+        </Alert>
+      )}
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <BsExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200  mb-4 mx-auto " />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400 ">
+              Are you sure you want to delete your account ?{" "}
+            </h3>
+          </div>
+          <div className="flex justify-center gap-8 ">
+            <Button onClick={handleDeleteUser} color="failure">
+              Yes, I'am sure
+            </Button>
+            <Button color="gray" onClick={() => setShowModal(false)}>
+              No, Cancle
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
