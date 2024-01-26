@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Alert, Button, Modal, TextInput } from "flowbite-react";
+import { Alert, Button, Modal, TextInput,  } from "flowbite-react";
 import {
   getDownloadURL,
   getStorage,
@@ -17,13 +17,15 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
-  signoutSuccess
+  signoutSuccess,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { BsExclamationCircle } from "react-icons/bs";
+import { Link } from "react-router-dom";
+
 
 function DashProfile() {
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUPloadProgress] = useState(null);
@@ -95,19 +97,19 @@ function DashProfile() {
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
     if (Object.keys(formData).length === 0) {
-      setUpdateUserError('No changes made');
+      setUpdateUserError("No changes made");
       return;
     }
     if (imageFileUploading) {
-      setUpdateUserError('Please wait for image to upload');
+      setUpdateUserError("Please wait for image to upload");
       return;
     }
     try {
       dispatch(updateStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -131,7 +133,7 @@ function DashProfile() {
     try {
       dispatch(deleteUserStart());
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       const data = await res.json();
       if (!res.ok) {
@@ -144,22 +146,21 @@ function DashProfile() {
     }
   };
 
-  const handleSignout =  async() => {
+  const handleSignout = async () => {
     try {
-      const res = await fetch('/api/user/signout',{
-        method: 'POST'
-      })
+      const res = await fetch("/api/user/signout", {
+        method: "POST",
+      });
       const data = await res.json();
-      if( !res.ok ){
+      if (!res.ok) {
         console.log(data.message);
-      }else{
-        dispatch(signoutSuccess())
+      } else {
+        dispatch(signoutSuccess());
       }
     } catch (error) {
       console.log(error);
     }
-  }
-
+  };
 
   return (
     <div className=" max-w-lg mx-auto p-3 w-full ">
@@ -230,9 +231,20 @@ function DashProfile() {
           placeholder="Update Your Password"
           onChange={handelChange}
         />
-        <Button type="submit" gradientDuoTone="purpleToBlue" outline>
-          Update
+        <Button type="submit" gradientDuoTone="purpleToBlue" outline disabled={loading || imageFileUploading} >
+         { loading ? 'loading...' : 'Update' }
         </Button>
+        {currentUser.isAdmin && (
+          <Link to={'/create-post'} >
+            <Button
+              type="button"
+              gradientDuoTone="purpleToBlue"
+              className="w-full"
+            >
+              Create a Post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 justify-between flex mt-3">
         <span
@@ -243,7 +255,9 @@ function DashProfile() {
         >
           Delete account
         </span>
-        <span className="cursor-pointer" onClick={handleSignout} >Sign-out</span>
+        <span className="cursor-pointer" onClick={handleSignout}>
+          Sign-out
+        </span>
       </div>
       {updateUserSuccess && (
         <Alert color="success" className="mt-5">
