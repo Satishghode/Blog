@@ -19,7 +19,6 @@ export default function CreatePost() {
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
   const [publishError, setPublishError] = useState(null);
-
   const navigate = useNavigate();
 
   const handleUpdloadImage = async () => {
@@ -58,6 +57,7 @@ export default function CreatePost() {
       console.log(error);
     }
   };
+  //submit button when the admin click on submit button this data will be submitted.
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -73,7 +73,6 @@ export default function CreatePost() {
         setPublishError(data.message);
         return;
       }
-
       if (res.ok) {
         setPublishError(null);
         navigate(`/post/${data.slug}`);
@@ -162,4 +161,4 @@ export default function CreatePost() {
       </form>
     </div>
   );
-}
+} 
